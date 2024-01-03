@@ -1,4 +1,4 @@
-//
+﻿//
 // ================================================
 // | Grafica pe calculator                        |
 // ================================================
@@ -33,15 +33,15 @@
 
 //  Identificatorii obiectelor de tip OpenGL; 
 GLuint
-VaoId_ground,
-VboId_ground,
-EboId_ground,
-VaoId_sphere,
-VboId_sphere,
-EboId_sphere,
-VaoId_cylinder,
-VboId_cylinder,
-EboId_cylinder,
+VaoId,
+VboId,
+EboId,
+VaoId1,
+VboId1,
+EboId1,
+VaoId2,
+VboId2,
+EboId2,
 ColorBufferId,
 ProgramId,
 ProgramIdcon,
@@ -71,11 +71,8 @@ glm::mat4 view;
 int const NR_PARR = 10, NR_MERID = 20;
 
 float const U_MIN = -PI, U_MAX = PI, V_MIN = 0, V_MAX = -2 * PI;
-float const U_MIN_sphere = -PI / 2, U_MAX_sphere = PI / 2, V_MIN_sphere = 0, V_MAX_sphere = 2 * PI;
-
 
 float step_u = (U_MAX - U_MIN) / NR_PARR, step_v = (V_MAX - V_MIN) / NR_MERID;
-float step_u_sphere = (U_MAX_sphere - U_MIN_sphere) / NR_PARR, step_v_sphere = (V_MAX_sphere - V_MIN_sphere) / NR_MERID;
 
 // elemente pentru matricea de proiectie
 float width = 800, height = 600, xwmin = -800.f, xwmax = 800, ywmin = -600, ywmax = 600, znear = 0.1, zfar = 1, fov = 45;
@@ -86,8 +83,8 @@ float xL = -10.f, yL = 300.f, zL = 200.f;
 
 int index, index_aux;
 
-float radius_sphere = 25.0f;
-float radius_cylinder = 10.0f;
+float radius1 = 150.0f;
+float radius2 = 10.0f;
 
 
 // matricea umbrei
@@ -183,14 +180,14 @@ void CreateVBO(void)
 		 17, 12, 18
 	};
 
-	glGenVertexArrays(1, &VaoId_ground);
-	glGenBuffers(1, &VboId_ground);
-	glGenBuffers(1, &EboId_ground);
-	glBindVertexArray(VaoId_ground);
+	glGenVertexArrays(1, &VaoId);
+	glGenBuffers(1, &VboId);
+	glGenBuffers(1, &EboId);
+	glBindVertexArray(VaoId);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VboId_ground);
+	glBindBuffer(GL_ARRAY_BUFFER, VboId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId_ground);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 	// atributul 0 = pozitie
@@ -204,9 +201,9 @@ void CreateVBO(void)
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
 }
 
-void CreateVBO_sphere(void)
+void CreateVBO1(void)
 {
-	/// SFERA
+	// SFERA
 	// Matricele pentru varfuri, culori, indici
 	glm::vec4 Vertices1[(NR_PARR + 1) * NR_MERID];
 	glm::vec3 Colors1[(NR_PARR + 1) * NR_MERID];
@@ -216,11 +213,11 @@ void CreateVBO_sphere(void)
 		for (int parr = 0; parr < NR_PARR + 1; parr++)
 		{
 			// implementarea reprezentarii parametrice 
-			float u = U_MIN_sphere + parr * step_u_sphere; // valori pentru u si v
-			float v = V_MIN_sphere + merid * step_v_sphere;
-			float x_vf = radius_sphere * cosf(u) * cosf(v); // coordonatele varfului corespunzator lui (u,v)
-			float y_vf = radius_sphere * cosf(u) * sinf(v);
-			float z_vf = 70 + radius_sphere * sinf(u);
+			float u = U_MIN + parr * step_u; // valori pentru u si v
+			float v = V_MIN + merid * step_v;
+			float x_vf = radius1 * cosf(u) * cosf(v); // coordonatele varfului corespunzator lui (u,v)
+			float y_vf = radius1 * cosf(u) * sinf(v);
+			float z_vf = 400 + radius1 * sinf(u);
 
 			// identificator ptr varf; coordonate + culoare + indice la parcurgerea meridianelor
 			index = merid * (NR_PARR + 1) + parr;
@@ -254,17 +251,17 @@ void CreateVBO_sphere(void)
 	};
 
 	// generare VAO/buffere
-	glGenVertexArrays(1, &VaoId_sphere);
-	glBindVertexArray(VaoId_sphere);
-	glGenBuffers(1, &VboId_sphere); // atribute
-	glGenBuffers(1, &EboId_sphere); // indici
+	glGenVertexArrays(1, &VaoId1);
+	glBindVertexArray(VaoId1);
+	glGenBuffers(1, &VboId1); // atribute
+	glGenBuffers(1, &EboId1); // indici
 
 	// legare+"incarcare" buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VboId_sphere);
+	glBindBuffer(GL_ARRAY_BUFFER, VboId1);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices1) + sizeof(Colors1), NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices1), Vertices1);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertices1), sizeof(Colors1), Colors1);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId_sphere);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId1);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices1), Indices1, GL_STATIC_DRAW);
 
 	// atributele; 
@@ -274,7 +271,7 @@ void CreateVBO_sphere(void)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(sizeof(Vertices1)));
 }
 
-void CreateVBO_cylinder(void)
+void CreateVBO2(void)
 {
 	// CILINDRU
 	glm::vec4 Vertices2[(NR_PARR + 1) * NR_MERID];
@@ -287,9 +284,9 @@ void CreateVBO_cylinder(void)
 			// implementarea reprezentarii parametrice 
 			float u = U_MIN + parr * step_u;
 			float v = V_MIN + merid * step_v;
-			float x_vf = radius_cylinder * cosf(v);
-			float y_vf = radius_cylinder * sinf(v);
-			float z_vf = radius_cylinder * 4.0f * sinf(u) + 25.0f;
+			float x_vf = radius2 * cosf(v);
+			float y_vf = radius2 * sinf(v);
+			float z_vf = radius2 * 4.0f * sinf(u) + 25.0f;
 
 			// identificator ptr varf; coordonate + culoare + indice la parcurgerea meridianelor
 			index = merid * (NR_PARR + 1) + parr;
@@ -322,17 +319,17 @@ void CreateVBO_cylinder(void)
 		}
 	};
 
-	glGenVertexArrays(1, &VaoId_cylinder);
-	glBindVertexArray(VaoId_cylinder);
-	glGenBuffers(1, &VboId_cylinder); // atribute
-	glGenBuffers(1, &EboId_cylinder); // indici
+	glGenVertexArrays(1, &VaoId2);
+	glBindVertexArray(VaoId2);
+	glGenBuffers(1, &VboId2); // atribute
+	glGenBuffers(1, &EboId2); // indici
 
 	// legare+"incarcare" buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VboId_cylinder);
+	glBindBuffer(GL_ARRAY_BUFFER, VboId2);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices2) + sizeof(Colors2), NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices2), Vertices2);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertices2), sizeof(Colors2), Colors2);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId_cylinder);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId2);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices2), Indices2, GL_STATIC_DRAW);
 
 	// atributele; 
@@ -342,6 +339,80 @@ void CreateVBO_cylinder(void)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(sizeof(Vertices2)));
 }
 
+//void CreateVBO2(void)
+//{
+//	// varfurile 
+//	// (4) Matricele pentru varfuri, culori, indici
+//	glm::vec4 Vertices2[(NR_PARR + 1) * NR_MERID];
+//	glm::vec3 Colors2[(NR_PARR + 1) * NR_MERID];
+//	GLushort Indices2[2 * (NR_PARR + 1) * NR_MERID + 4 * (NR_PARR + 1) * NR_MERID];
+//	for (int merid = 0; merid < NR_MERID; merid++)
+//	{
+//		for (int parr = 0; parr < NR_PARR + 1; parr++)
+//		{
+//			// implementarea reprezentarii parametrice 
+//			float u = U_MIN + parr * step_u; // valori pentru u si v
+//			float v = V_MIN + merid * step_v;
+//			float x_vf = 15 * v * cosf(u); // coordonatele varfului corespunzator lui (u,v)
+//			float y_vf = 15 * v * sin(u);
+//			float z_vf = 90 + 15 * v;
+//
+//			// identificator ptr varf; coordonate + culoare + indice la parcurgerea meridianelor
+//			index = merid * (NR_PARR + 1) + parr;
+//			Vertices2[index] = glm::vec4(x_vf, y_vf, z_vf, 1.0);
+//			Colors2[index] = glm::vec3(0.5f * (1.0f + sinf(u)), 0.5f * (1.0f + cosf(u)), 0.5f * (1.0f + sinf(u) * cosf(u)));
+//			Indices2[index] = index;
+//
+//			// indice ptr acelasi varf la parcurgerea paralelelor
+//			index_aux = parr * (NR_MERID)+merid;
+//			Indices2[(NR_PARR + 1) * NR_MERID + index_aux] = index;
+//
+//			// indicii pentru desenarea fetelor, pentru varful curent sunt definite 4 varfuri
+//			if ((parr + 1) % (NR_PARR + 1) != 0) // varful considerat sa nu fie Polul Nord
+//			{
+//				int AUX = 2 * (NR_PARR + 1) * NR_MERID;
+//				int index1 = index; // varful v considerat
+//				int index2 = index + (NR_PARR + 1); // dreapta lui v, pe meridianul urmator
+//				int index3 = index2 + 1;  // dreapta sus fata de v
+//				int index4 = index + 1;  // deasupra lui v, pe acelasi meridian
+//				if (merid == NR_MERID - 1)  // la ultimul meridian, trebuie revenit la meridianul initial
+//				{
+//					index2 = index2 % (NR_PARR + 1);
+//					index3 = index3 % (NR_PARR + 1);
+//				}
+//				Indices2[AUX + 4 * index] = index1;  // unele valori ale lui Indices, corespunzatoare Polului Nord, au valori neadecvate
+//				Indices2[AUX + 4 * index + 1] = index2;
+//				Indices2[AUX + 4 * index + 2] = index3;
+//				Indices2[AUX + 4 * index + 3] = index4;
+//			}
+//		}
+//	};
+//
+//	glGenVertexArrays(1, &VaoId2);
+//	glBindVertexArray(VaoId2);
+//
+//	// generare VAO/buffere
+//	glGenBuffers(1, &VboId2); // atribute
+//	glGenBuffers(1, &EboId2); // indici
+//
+//
+//	// legare+"incarcare" buffer
+//	glBindBuffer(GL_ARRAY_BUFFER, VboId2);
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId2);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices2) + sizeof(Colors2), NULL, GL_STATIC_DRAW);
+//	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices2), Vertices2);
+//	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertices2), sizeof(Colors2), Colors2);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices2), Indices2, GL_STATIC_DRAW);
+//
+//	// atributele; 
+//	glEnableVertexAttribArray(0); // atributul 0 = pozitie
+//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+//	glEnableVertexAttribArray(1); // atributul 1 = culoare
+//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)sizeof(Vertices2));
+//	glEnableVertexAttribArray(2); // atributul 2 = normala
+//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)(sizeof(Vertices2) + sizeof(Colors2)));
+//
+//}
 
 void DestroyVBO(void)
 {
@@ -349,16 +420,14 @@ void DestroyVBO(void)
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &VboId_ground);
-	glDeleteBuffers(1, &EboId_ground);
+	glDeleteBuffers(1, &VboId);
+	glDeleteBuffers(1, &EboId);
 	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &VaoId_ground);
-	glDeleteBuffers(1, &VboId_sphere);
-	glDeleteBuffers(1, &EboId_sphere);
+	glDeleteVertexArrays(1, &VaoId);
 
-	glDeleteBuffers(1, &VboId_cylinder);
-	glDeleteBuffers(1, &EboId_cylinder);
-	glDeleteVertexArrays(1, &VaoId_cylinder);
+	glDeleteBuffers(1, &VboId2);
+	glDeleteBuffers(1, &EboId2);
+	glDeleteVertexArrays(1, &VaoId2);
 
 }
 
@@ -379,8 +448,7 @@ void Initialize(void)
 	matrRot = glm::rotate(glm::mat4(1.0f), PI / 8, glm::vec3(0.0, 0.0, 1.0));
 	glClearColor(0.68f, 0.91f, 0.92f, 0.0f);
 	CreateVBO();
-	CreateVBO_sphere();
-	CreateVBO_cylinder();
+	CreateVBO2();
 	CreateShaders();
 	// locatii pentru shader-e
 	myMatrixLocation = glGetUniformLocation(ProgramId, "myMatrix");
@@ -393,39 +461,58 @@ void Initialize(void)
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
 }
 
-void CreateBlock(float x, float y, float z) {
-
-	glBindVertexArray(VaoId_ground);
-	codCol = 0;
-	glUniform1i(codColLocation, codCol);
-
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+void createBeam(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+	
+	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
 
-void CreateTree(float x, float y, float z) {
-	// SFERA
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-	glBindVertexArray(VaoId_sphere);
+void CreateBlock(float translate_x, float translate_y, float translate_z) {
+	// 100.0f L
+	glBindVertexArray(VaoId);
 	codCol = 0;
 	glUniform1i(codColLocation, codCol);
-	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
-	{
-		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
-			glDrawElements(
-				GL_QUADS,
-				4,
-				GL_UNSIGNED_SHORT,
-				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
-	}
+
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+	createBeam(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f); 
+	createBeam(translate_x - 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f); 
+	createBeam(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f); 
+	createBeam(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
+}
+
+void CreateTree() {
+	// SFERA
+	glBindVertexArray(VaoId1);
+	codCol = 0;
+	glUniform1i(codColLocation, codCol);
+	myMatrix = glm::mat4(1.0f);
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	//for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	//{
+	//	if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+	//		glDrawElements(
+	//			GL_QUADS,
+	//			4,
+	//			GL_UNSIGNED_SHORT,
+	//			(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	//}
 
 	// CUBUL
-	glBindVertexArray(VaoId_cylinder);
+	glBindVertexArray(VaoId2);
 	codCol = 0;
+	//myMatrix = projection * view * matrTransl1;
+	//glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, &projection[0][0]);
 	glUniform1i(codColLocation, codCol);
 	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
 	{
@@ -470,7 +557,7 @@ void RenderFunction(void)
 	glUniform3f(lightPosLocation, xL, yL, zL);
 	glUniform3f(viewPosLocation, Obsx, Obsy, Obsz);
 
-	glBindVertexArray(VaoId_ground);
+	glBindVertexArray(VaoId);
 	codCol = 0;
 	glUniform1i(codColLocation, codCol);
 	myMatrix = glm::mat4(1.0f);
@@ -484,8 +571,7 @@ void RenderFunction(void)
 
 	// copaci
 
-	CreateTree(-100.0f, -100.0f, 0.0f);
-	CreateTree(150.0f, 200.0f, 0.0f);
+	//CreateTree();
 
 	glutSwapBuffers();
 	glFlush();
