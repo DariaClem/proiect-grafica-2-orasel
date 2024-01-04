@@ -428,7 +428,7 @@ void createWindow(float translate_x, float translate_y, float translate_z, float
 	// window frame
 	createWindowFrame(translate_x + 50.0f, translate_y - 30.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f);
 	createWindowFrame(translate_x + 50.0f, translate_y - 10.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f);
-	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.02f, 0.2f);
+	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.2f);
 
 	createWindowFrame(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.17f, 0.02f);
 	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f);
@@ -458,8 +458,11 @@ void CreateBlock(float translate_x, float translate_y, float translate_z) {
 	createBeam(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
 	createBeam(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
 
-	createWindow(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y + 40.0f, translate_z, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y + 40.0f, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y + 40.0f, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void CreateTree(float x, float y, float z) {
