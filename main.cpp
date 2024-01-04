@@ -112,6 +112,7 @@ void processNormalKeys(unsigned char key, int x, int y)
 	if (key == 27)
 		exit(0);
 }
+
 void processSpecialKeys(int key, int xx, int yy)
 {
 	switch (key)
@@ -391,6 +392,48 @@ void Initialize(void)
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
 }
 
+void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_sphere);
+	codCol = 0;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
+}
+
+void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+	// CUBUL
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_cylinder);
+	codCol = 0;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
+}
+
+void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+
+}
+
 void createBeam(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
@@ -472,17 +515,59 @@ void createDoor(float translate_x, float translate_y, float translate_z, float s
 	createDoorFrame(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f);
 }
 
-void CreateBlock(float translate_x, float translate_y, float translate_z) {
+void createBuilding(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
 	// 100.0f L
 	glBindVertexArray(VaoId_ground);
 	codCol = 0;
 	glUniform1i(codColLocation, codCol);
 
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+void createBrick(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+void createChimney(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	// con
+	// cilindru
+	createCylinder(translate_x, translate_y, translate_z, 0.5f, 0.5f, 0.1f);
+}
+
+void createRoof(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	createBrick(translate_x - 25.0f, translate_y - 25.0f, translate_z + 150.2f, 0.11f, 0.11f, 0.01f);
+	createBrick(translate_x - 25.0f, translate_y - 5.0f, translate_z + 151.2f, 0.11f, 0.11f, 0.01f);
+
+	createChimney(translate_x + 20.0f, translate_y - 25.0f, translate_z + 150.2f, 1.0f, 1.0f, 1.0f);
+}
+
+void createPanel(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+void CreateBlock(float translate_x, float translate_y, float translate_z) {
+	createBuilding(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f);
 
 	// beams
 	createBeam(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f);
@@ -503,40 +588,32 @@ void CreateBlock(float translate_x, float translate_y, float translate_z) {
 	createWindow(translate_x, translate_y + 40.0f, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
 	createWindow(translate_x, translate_y, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
 
+
 	// door
 	createDoor(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
+
+
+	// wall
+	createBuilding(translate_x, translate_y, translate_z, 1.01f, 1.01f, 1.0f / 2.5f);
+
+
+	// bricks
+	createBrick(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f);
+
+	// panel
+	createPanel(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f);
+
+	// roof
+	createRoof(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f);
 }
 
 void CreateTree(float x, float y, float z) {
-	// SFERA
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-	glBindVertexArray(VaoId_sphere);
-	codCol = 0;
-	glUniform1i(codColLocation, codCol);
-	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
-	{
-		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
-			glDrawElements(
-				GL_QUADS,
-				4,
-				GL_UNSIGNED_SHORT,
-				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
-	}
-
-	// CUBUL
-	glBindVertexArray(VaoId_cylinder);
-	codCol = 0;
-	glUniform1i(codColLocation, codCol);
-	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
-	{
-		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
-			glDrawElements(
-				GL_QUADS,
-				4,
-				GL_UNSIGNED_SHORT,
-				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
-	}
+	createSphere(x, y, z, 1.0f, 1.0f, 1.0f);
+	createCylinder(x, y, z, 1.0f, 1.0f, 1.0f);
 }
 
 void RenderFunction(void)
