@@ -440,6 +440,38 @@ void createWindow(float translate_x, float translate_y, float translate_z, float
 	createWindowGlass(translate_x + 49.8f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.22f, 0.2f);
 }
 
+void createDoorFrame(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+void createDoorBase(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+void createDoor(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+	createDoorFrame(translate_x + 50.0f, translate_y - 30.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f);
+	createDoorFrame(translate_x + 50.0f, translate_y - 10.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f);
+	createDoorFrame(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.265f * 100.0f, 0.05f, 0.17f, 0.02f);
+
+	createDoorBase(translate_x + 49.5f, translate_y - 20.0f, translate_z + 80.0f, 0.05f, 0.2f, 0.33f);
+
+	createDoorFrame(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f);
+}
+
 void CreateBlock(float translate_x, float translate_y, float translate_z) {
 	// 100.0f L
 	glBindVertexArray(VaoId_ground);
@@ -458,11 +490,21 @@ void CreateBlock(float translate_x, float translate_y, float translate_z) {
 	createBeam(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
 	createBeam(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
 
+	createBeam(translate_x + 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f);
+	createBeam(translate_x - 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f);
+	createBeam(translate_x, translate_y + 50.0f, translate_z, 1.0f, 0.05f, 0.03f);
+	createBeam(translate_x, translate_y - 50.0f, translate_z, 1.0f, 0.05f, 0.03f);
+
+
+	// windows
 	createWindow(translate_x, translate_y, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
 	createWindow(translate_x, translate_y + 40.0f, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
 	createWindow(translate_x, translate_y, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
 	createWindow(translate_x, translate_y + 40.0f, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
+
+	// door
+	createDoor(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void CreateTree(float x, float y, float z) {
