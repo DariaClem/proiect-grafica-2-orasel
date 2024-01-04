@@ -598,11 +598,32 @@ void CreateBlock(float translate_x, float translate_y, float translate_z) {
 
 
 	// bricks
+	// front
 	createBrick(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f);
 	createBrick(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f);
 	createBrick(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f);
 	createBrick(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f);
 	createBrick(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f);
+
+	// back
+	createBrick(translate_x - 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x - 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x - 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x - 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f);
+	createBrick(translate_x - 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f);
+
+	// right
+	createBrick(translate_x, translate_y + 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x + 22.0f, translate_y + 50.2f, translate_z + 90.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x - 12.0f, translate_y + 50.2f, translate_z + 120.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x + 40.0f, translate_y + 50.2f, translate_z + 10.0f, 0.1f, 0.05f, 0.03f);
+
+	// left
+	createBrick(translate_x, translate_y - 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x - 22.0f, translate_y - 50.2f, translate_z + 130.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x - 2.0f, translate_y - 50.2f, translate_z + 20.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x - 45.0f, translate_y - 50.2f, translate_z + 70.0f, 0.1f, 0.05f, 0.03f);
+	createBrick(translate_x + 35.0f, translate_y - 50.2f, translate_z + 110.0f, 0.1f, 0.05f, 0.03f);
 
 	// panel
 	createPanel(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f);
