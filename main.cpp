@@ -637,6 +637,25 @@ void CreateTree(float x, float y, float z) {
 	createCylinder(x, y, z, 1.0f, 1.0f, 1.0f);
 }
 
+void CreateGard(float translate_x, float translate_y, float translate_z) {
+	createBrick(translate_x, translate_y, translate_z + 17.0f, 0.018f, 1.85f, 0.02f);
+
+	for (int index = 85; index >= -87; index -= 12)
+		createBrick(translate_x, translate_y - index, translate_z, 0.02f, 0.032f, 0.16f);
+
+}
+
+void CreateResidence(float translate_x, float translate_y, float translate_z) {
+	createBrick(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f); // baza sub block
+	
+	CreateGard(translate_x + 120.0f , translate_y, translate_z - 5.0f);
+
+	CreateBlock(translate_x, translate_y, translate_z); 
+	
+	CreateTree(translate_x, translate_y - 75.0f, translate_z);
+	CreateTree(translate_x, translate_y + 75.0f, translate_z);
+}
+
 void RenderFunction(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -678,13 +697,14 @@ void RenderFunction(void)
 
 	// blocuri
 
-	CreateBlock(0.0f, 10.0f, 0.0f);
-	CreateBlock(0.0f, 200.0f, 0.0f);
+	CreateResidence(0.0f, 0.0f, 0.0f);
+
+
 
 	// copaci
 
-	CreateTree(-100.0f, -100.0f, 0.0f);
-	CreateTree(150.0f, 200.0f, 0.0f);
+	//CreateTree(-100.0f, -100.0f, 0.0f);
+	//CreateTree(150.0f, 200.0f, 0.0f);
 
 	glutSwapBuffers();
 	glFlush();
