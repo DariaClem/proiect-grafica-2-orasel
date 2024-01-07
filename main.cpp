@@ -42,6 +42,9 @@ EboId_sphere,
 VaoId_cylinder,
 VboId_cylinder,
 EboId_cylinder,
+VaoId_rock,
+VboId_rock,
+EboId_rock,
 ColorBufferId,
 ProgramId,
 ProgramIdcon,
@@ -143,23 +146,25 @@ void CreateVBO(void)
 		1500.0f,  -1500.0f, 0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
 		1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   -1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
-	   // varfuri cub
-		-50.0f,  -50.0f, 0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  -1.0f, -1.0f, -1.0f,
-		 50.0f,  -50.0f,  0.0f, 1.0f,  1.0f, 0.5f, 0.2f,  1.0f, -1.0f, -1.0f,
-		 50.0f,  50.0f,  0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  1.0f, 1.0f, -1.0f,
-		-50.0f,  50.0f, 0.0f, 1.0f,    1.0f, 0.5f, 0.2f,  -1.0f, 1.0f, -1.0f,
-		-50.0f,  -50.0f, 150.0f, 1.0f,  1.0f, 0.5f, 0.2f,  -1.0f, -1.0f, 1.0f,
-		 50.0f,  -50.0f,  150.0f, 1.0f, 1.0f, 0.5f, 0.2f,  1.0f, -1.0f, 1.0f,
-		 50.0f,  50.0f,  150.0f, 1.0f,  1.0f, 0.5f, 0.2f,  1.0f, 1.0f, 1.0f,
-		-50.0f,  50.0f, 150.0f, 1.0f,   1.0f, 0.5f, 0.2f,  -1.0f, 1.0f, 1.0f,
-		// varfuri con
-		 -40.0f, -69.28f, 0.0f, 1.0f,   0.1f, 1.0f, 0.2f, -40.0f, -69.28f, 80.0f,
-		 40.0f, -69.28f, 0.0f, 1.0f,    0.1f, 1.0f, 0.2f, 40.0f, -69.28f, 80.0f,
-		 80.0f, 0.0f, 0.0f, 1.0f,       0.1f, 1.0f, 0.2f, 80.0f, 0.0f, 80.0f,
-		 40.0f, 69.28f, 0.0f, 1.0f,     0.1f, 1.0f, 0.2f, 40.0f, 69.28f, 80.0f,
-		-40.0f, 69.28f, 0.0f, 1.0f,     0.1f, 1.0f, 0.2f, -40.0f, 69.28f, 80.0f,
-		-80.0f, 0.0f,  0.0f, 1.0f,      0.1f, 1.0f, 0.2f, -80.0f, 0.0f, 80.0f,
-		  0.0f, 0.0f, 100.0f, 1.0f,     0.3f, 1.0f, 0.2f, 0.0f, 0.0f, 1.0f,
+	   // varfurile cubului
+	   -50.0f,  -50.0f, 0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
+	   50.0f,  -50.0f,  0.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
+	   50.0f,  50.0f,  0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
+	   -50.0f,  50.0f,  0.0f, 1.0f,    1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
+
+	   -50.0f,  -50.0f, 150.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   50.0f,  -50.0f,  150.0f, 1.0f, 1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   50.0f,  50.0f,  150.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   -50.0f,  50.0f, 150.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+
+	   // varfuri con
+		-40.0f, -69.28f, 0.0f, 1.0f,   0.1f, 1.0f, 0.2f, -40.0f, -69.28f, 80.0f,
+		40.0f, -69.28f, 0.0f, 1.0f,    0.1f, 1.0f, 0.2f, 40.0f, -69.28f, 80.0f,
+		80.0f, 0.0f, 0.0f, 1.0f,       0.1f, 1.0f, 0.2f, 80.0f, 0.0f, 80.0f,
+		40.0f, 69.28f, 0.0f, 1.0f,     0.1f, 1.0f, 0.2f, 40.0f, 69.28f, 80.0f,
+	   -40.0f, 69.28f, 0.0f, 1.0f,     0.1f, 1.0f, 0.2f, -40.0f, 69.28f, 80.0f,
+	   -80.0f, 0.0f,  0.0f, 1.0f,      0.1f, 1.0f, 0.2f, -80.0f, 0.0f, 80.0f,
+		 0.0f, 0.0f, 100.0f, 1.0f,     0.3f, 1.0f, 0.2f, 0.0f, 0.0f, 1.0f,
 	};
 
 	// indicii pentru varfuri
@@ -191,6 +196,62 @@ void CreateVBO(void)
 	glBindBuffer(GL_ARRAY_BUFFER, VboId_ground);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId_ground);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+	// atributul 0 = pozitie
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(GLfloat), (GLvoid*)0);
+	// atributul 1 = culoare
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(GLfloat), (GLvoid*)(4 * sizeof(GLfloat)));
+	// atributul 2 = normale
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
+}
+
+void CreateVBO_rock(void)
+{
+	// varfurile 
+	GLfloat Vertices[] =
+	{
+		// coordinates              // colors         // normals
+		10.0f,  10.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+		20.0f,   0.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+		40.0f,  10.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+		40.0f,  30.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+		20.0f,  40.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+		10.0f,  20.0f,  0.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, -1.0f,
+
+		10.0f,  10.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+		20.0f,   0.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+		40.0f,  10.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+		40.0f,  30.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+		20.0f,  40.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+		10.0f,  20.0f,  10.0f, 1.0f,   0.71f, 0.75f, 0.81f,   0.0f, 0.0f, 1.0f,
+	};
+
+	// indicii pentru varfuri
+	GLubyte Indices[] =
+	{
+		0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5,
+		0, 6, 1, 6, 1, 7,
+		7, 1, 2, 7, 2, 8,
+		8, 2, 9, 9, 2, 3,
+		9, 3, 10, 10, 3, 4,
+		10, 4, 5, 10, 5, 11,
+		11, 5, 0, 11, 6, 0,
+		6, 7, 8, 6, 8, 9, 6, 9, 10, 6, 10, 11
+
+	};
+
+	glGenVertexArrays(1, &VaoId_rock);
+	glGenBuffers(1, &VboId_rock);
+	glGenBuffers(1, &EboId_rock);
+	glBindVertexArray(VaoId_rock);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VboId_rock);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId_rock);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 	// atributul 0 = pozitie
@@ -359,6 +420,10 @@ void DestroyVBO(void)
 	glDeleteBuffers(1, &EboId_cylinder);
 	glDeleteVertexArrays(1, &VaoId_cylinder);
 
+	glDeleteBuffers(1, &VboId_rock);
+	glDeleteBuffers(1, &EboId_rock);
+	glDeleteVertexArrays(1, &VaoId_rock);
+
 }
 
 void CreateShaders(void)
@@ -380,6 +445,7 @@ void Initialize(void)
 	CreateVBO();
 	CreateVBO_sphere();
 	CreateVBO_cylinder();
+	CreateVBO_rock();
 	CreateShaders();
 	// locatii pentru shader-e
 	myMatrixLocation = glGetUniformLocation(ProgramId, "myMatrix");
@@ -392,7 +458,7 @@ void Initialize(void)
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
 }
 
-void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_sphere);
@@ -409,7 +475,7 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 	}
 }
 
-void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
 	// CUBUL
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
@@ -430,14 +496,13 @@ void createCylinder(float translate_x, float translate_y, float translate_z, flo
 	}
 }
 
-void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
-
+void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
 }
 
-void createBeam(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) { 
+void createBeam(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-	
+
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
@@ -645,15 +710,51 @@ void CreateGard(float translate_x, float translate_y, float translate_z) {
 
 }
 
+void createRock(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	glBindVertexArray(VaoId_rock);
+	codCol = 0;
+	glUniform1i(codColLocation, codCol);
+
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
+
+	myMatrix = myMatrix * scaleMat * rotateMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_BYTE, (void*)(0));
+}
+
+void CreateBumpyTerrain(float translate_x, float translate_y, float translate_z) {
+	createRock(translate_x + 80.0f, translate_y - 85.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, PI / 2, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 50.0f, translate_y - 100.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.25f, 0.25f, PI / 2, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 30.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.15f, PI / 3, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 75.0f, translate_y - 30.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.25f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 65.0f, translate_y + 40.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.35f, PI / 5, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 20.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.05f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 50.0f, translate_y - 90.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.1f, 0.15f, PI / 6, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 60.0f, translate_y - 60.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.3f, PI / 2, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 30.0f, translate_y + 60.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.2f, 0.35f, 1.0f, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x - 15.0f, translate_y + 75.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.3f, 0.2f, PI / 4, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x, translate_y + 95.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.1f, 0.15f, PI / 4, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 20.0f, translate_y + 50.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 43.0f, translate_y + 68.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.1f, 0.15f, PI / 8, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 60.0f, translate_y + 55.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.2f, 0.35f, PI / 2, 0.0f, 0.0f, 1.0f);
+	createRock(translate_x + 80.0f, translate_y + 80.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.3f, 0.25f, PI / 3, 0.0f, 0.0f, 1.0f);
+}
+
 void CreateResidence(float translate_x, float translate_y, float translate_z) {
 	createBrick(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f); // baza sub block
-	
-	CreateGard(translate_x + 120.0f , translate_y, translate_z - 5.0f);
 
-	CreateBlock(translate_x, translate_y, translate_z); 
-	
+	CreateGard(translate_x + 120.0f, translate_y, translate_z - 5.0f);
+
+	CreateBlock(translate_x, translate_y, translate_z);
+
 	CreateTree(translate_x, translate_y - 75.0f, translate_z);
 	CreateTree(translate_x, translate_y + 75.0f, translate_z);
+
+	CreateBumpyTerrain(translate_x, translate_y, translate_z);
 }
 
 void RenderFunction(void)
@@ -698,8 +799,6 @@ void RenderFunction(void)
 	// blocuri
 
 	CreateResidence(0.0f, 0.0f, 0.0f);
-
-
 
 	// copaci
 
