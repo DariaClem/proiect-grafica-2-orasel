@@ -458,8 +458,13 @@ void Initialize(void)
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
 }
 
-void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
+
+	myMatrix = myMatrix * scaleMat * rotateMat;
+
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_sphere);
 	codCol = 0;
@@ -475,12 +480,13 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 	}
 }
 
-void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	// CUBUL
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
 
-	myMatrix = myMatrix * scaleMat;
+	myMatrix = myMatrix * scaleMat * rotateMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_cylinder);
 	codCol = 0;
@@ -496,12 +502,16 @@ void createCylinder(float translate_x, float translate_y, float translate_z, flo
 	}
 }
 
-void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 }
 
-void createBeam(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+void createParallelipiped(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	glm::mat4 transform = glm::mat4(1.0f);
+	transform = glm::rotate(transform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	myMatrix = glm::translate(transform, glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	// glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
 
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
@@ -510,83 +520,41 @@ void createBeam(float translate_x, float translate_y, float translate_z, float s
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
 
-void createWindowFrame(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-}
-
-void createWindowGlass(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-}
-
-void createWindow(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createWindow(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	// window frame
-	createWindowFrame(translate_x + 50.0f, translate_y - 30.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f);
-	createWindowFrame(translate_x + 50.0f, translate_y - 10.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f);
-	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.2f);
+	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
 
-	createWindowFrame(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.17f, 0.02f);
-	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f);
-	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 2 * 100.0f, 0.05f, 0.17f, 0.01f);
-	createWindowFrame(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 3 * 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f);
-	createWindowFrame(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.27f * 100.0f, 0.05f, 0.17f, 0.02f);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 2 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 3 * 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.27f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
 
 	// window glass
-	createWindowGlass(translate_x + 49.8f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.22f, 0.2f);
+	createParallelipiped(translate_x + 49.8f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.22f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void createDoorFrame(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+void createDoor(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.265f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
 
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	createParallelipiped(translate_x + 49.5f, translate_y - 20.0f, translate_z + 80.0f, 0.05f, 0.2f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
 
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+	createParallelipiped(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void createDoorBase(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-}
-
-void createDoor(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	createDoorFrame(translate_x + 50.0f, translate_y - 30.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f);
-	createDoorFrame(translate_x + 50.0f, translate_y - 10.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f);
-	createDoorFrame(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.265f * 100.0f, 0.05f, 0.17f, 0.02f);
-
-	createDoorBase(translate_x + 49.5f, translate_y - 20.0f, translate_z + 80.0f, 0.05f, 0.2f, 0.33f);
-
-	createDoorFrame(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f);
-}
-
-void createBuilding(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createBuilding(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	// 100.0f L
 	glBindVertexArray(VaoId_ground);
 	codCol = 0;
 	glUniform1i(codColLocation, codCol);
 
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 transform = glm::mat4(1.0f);
+	transform = glm::rotate(transform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	myMatrix = glm::translate(transform, glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
 
 	myMatrix = myMatrix * scaleMat;
@@ -596,117 +564,95 @@ void createBuilding(float translate_x, float translate_y, float translate_z, flo
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
 
-void createBrick(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-}
-
-void createChimney(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
+void createChimney(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	// con
 	// cilindru
-	createCylinder(translate_x, translate_y, translate_z, 0.5f, 0.5f, 0.1f);
+	createCylinder(translate_x, translate_y, translate_z, 0.5f, 0.5f, 0.1f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void createRoof(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	createBrick(translate_x - 25.0f, translate_y - 25.0f, translate_z + 150.2f, 0.11f, 0.11f, 0.01f);
-	createBrick(translate_x - 25.0f, translate_y - 5.0f, translate_z + 151.2f, 0.11f, 0.11f, 0.01f);
+void createRoof(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createParallelipiped(translate_x - 25.0f, translate_y - 25.0f, translate_z + 150.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 25.0f, translate_y - 5.0f, translate_z + 151.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
 
-	createChimney(translate_x + 20.0f, translate_y - 25.0f, translate_z + 150.2f, 1.0f, 1.0f, 1.0f);
+	// createParallelipiped(translate_x + 20.0f, translate_y - 25.0f, translate_z + 150.2f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void createPanel(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z) {
-	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
-
-	myMatrix = myMatrix * scaleMat;
-	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
-
-	glUniform1i(codColLocation, codCol);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-}
-
-void CreateBlock(float translate_x, float translate_y, float translate_z) {
-	createBuilding(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f);
+void CreateBlock(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createParallelipiped(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 
 	// beams
-	createBeam(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f);
-	createBeam(translate_x - 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f);
-	createBeam(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
-	createBeam(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f);
+	createParallelipiped(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
-	createBeam(translate_x + 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f);
-	createBeam(translate_x - 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f);
-	createBeam(translate_x, translate_y + 50.0f, translate_z, 1.0f, 0.05f, 0.03f);
-	createBeam(translate_x, translate_y - 50.0f, translate_z, 1.0f, 0.05f, 0.03f);
+	createParallelipiped(translate_x + 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y + 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y - 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
 
 	// windows
-	createWindow(translate_x, translate_y, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y + 40.0f, translate_z + 15.0f, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y + 40.0f, translate_z - 25.0f, 1.0f, 1.0f, 1.0f);
-	createWindow(translate_x, translate_y, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
+	createWindow(translate_x, translate_y, translate_z + 15.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createWindow(translate_x, translate_y + 40.0f, translate_z + 15.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createWindow(translate_x, translate_y, translate_z - 25.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createWindow(translate_x, translate_y + 40.0f, translate_z - 25.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createWindow(translate_x, translate_y, translate_z - 75.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 
 
 	// door
-	createDoor(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f);
+	createDoor(translate_x, translate_y + 40.0f, translate_z - 75.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 
 
 	// wall
-	createBuilding(translate_x, translate_y, translate_z, 1.01f, 1.01f, 1.0f / 2.5f);
+	createBuilding(translate_x, translate_y, translate_z, 1.01f, 1.01f, 1.0f / 2.5f, angle, rotate_x, rotate_y, rotate_z);
 
 
 	// bricks
 	// front
-	createBrick(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f);
+	createParallelipiped(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
 	// back
-	createBrick(translate_x - 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x - 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x - 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x - 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f);
-	createBrick(translate_x - 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f);
+	createParallelipiped(translate_x - 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
 	// right
-	createBrick(translate_x, translate_y + 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x + 22.0f, translate_y + 50.2f, translate_z + 90.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x - 12.0f, translate_y + 50.2f, translate_z + 120.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x + 40.0f, translate_y + 50.2f, translate_z + 10.0f, 0.1f, 0.05f, 0.03f);
+	createParallelipiped(translate_x, translate_y + 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 22.0f, translate_y + 50.2f, translate_z + 90.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 12.0f, translate_y + 50.2f, translate_z + 120.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 40.0f, translate_y + 50.2f, translate_z + 10.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
 	// left
-	createBrick(translate_x, translate_y - 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x - 22.0f, translate_y - 50.2f, translate_z + 130.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x - 2.0f, translate_y - 50.2f, translate_z + 20.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x - 45.0f, translate_y - 50.2f, translate_z + 70.0f, 0.1f, 0.05f, 0.03f);
-	createBrick(translate_x + 35.0f, translate_y - 50.2f, translate_z + 110.0f, 0.1f, 0.05f, 0.03f);
+	createParallelipiped(translate_x, translate_y - 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 22.0f, translate_y - 50.2f, translate_z + 130.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 2.0f, translate_y - 50.2f, translate_z + 20.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 45.0f, translate_y - 50.2f, translate_z + 70.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 35.0f, translate_y - 50.2f, translate_z + 110.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
 
 	// panel
-	createPanel(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f);
+	createParallelipiped(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f, angle, rotate_x, rotate_y, rotate_z);
 
 	// roof
-	createRoof(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f);
+	createRoof(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void CreateTree(float x, float y, float z) {
-	createSphere(x, y, z, 1.0f, 1.0f, 1.0f);
-	createCylinder(x, y, z, 1.0f, 1.0f, 1.0f);
+void CreateTree(float x, float y, float z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createSphere(x, y, z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createCylinder(x, y, z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
-void CreateGard(float translate_x, float translate_y, float translate_z) {
-	createBrick(translate_x, translate_y, translate_z + 17.0f, 0.018f, 1.85f, 0.02f);
+void CreateGard(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createParallelipiped(translate_x, translate_y, translate_z + 17.0f, 0.018f, 1.85f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
 
 	for (int index = 85; index >= -87; index -= 12)
-		createBrick(translate_x, translate_y - index, translate_z, 0.02f, 0.032f, 0.16f);
+		createParallelipiped(translate_x, translate_y - index, translate_z, 0.02f, 0.032f, 0.16f, angle, rotate_x, rotate_y, rotate_z);
 
 }
 
@@ -726,35 +672,35 @@ void createRock(float translate_x, float translate_y, float translate_z, float s
 	glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_BYTE, (void*)(0));
 }
 
-void CreateBumpyTerrain(float translate_x, float translate_y, float translate_z) {
-	createRock(translate_x + 80.0f, translate_y - 85.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, PI / 2, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 50.0f, translate_y - 100.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.25f, 0.25f, PI / 2, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 30.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.15f, PI / 3, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 75.0f, translate_y - 30.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.25f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 65.0f, translate_y + 40.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.35f, PI / 5, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 20.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.05f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 50.0f, translate_y - 90.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.1f, 0.15f, PI / 6, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 60.0f, translate_y - 60.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.3f, PI / 2, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 30.0f, translate_y + 60.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.2f, 0.35f, 1.0f, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x - 15.0f, translate_y + 75.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.3f, 0.2f, PI / 4, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x, translate_y + 95.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.1f, 0.15f, PI / 4, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 20.0f, translate_y + 50.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, PI / 4, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 43.0f, translate_y + 68.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.1f, 0.15f, PI / 8, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 60.0f, translate_y + 55.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.2f, 0.35f, PI / 2, 0.0f, 0.0f, 1.0f);
-	createRock(translate_x + 80.0f, translate_y + 80.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.3f, 0.25f, PI / 3, 0.0f, 0.0f, 1.0f);
+void CreateBumpyTerrain(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createRock(translate_x + 80.0f, translate_y - 85.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, angle + PI / 2, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 50.0f, translate_y - 100.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.25f, 0.25f, angle + PI / 2, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 30.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.15f, angle + PI / 3, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 75.0f, translate_y - 30.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.25f, 0.25f, angle + PI / 4, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 65.0f, translate_y + 40.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.35f, angle + PI / 5, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 20.0f, translate_y - 80.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.05f, 0.25f, angle + PI / 4, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 50.0f, translate_y - 90.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.1f, 0.15f, angle + PI / 6, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 60.0f, translate_y - 60.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.3f, angle + PI / 2, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 30.0f, translate_y + 60.0f, translate_z + 0.02 * 150.0f, 0.25f, 0.2f, 0.35f, angle + 1.0f, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x - 15.0f, translate_y + 75.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.3f, 0.2f, angle + PI / 4, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x, translate_y + 95.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.1f, 0.15f, angle + PI / 4, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 20.0f, translate_y + 50.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.35f, 0.25f, angle + PI / 4, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 43.0f, translate_y + 68.0f, translate_z + 0.02 * 150.0f, 0.05f, 0.1f, 0.15f, angle + PI / 8, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 60.0f, translate_y + 55.0f, translate_z + 0.02 * 150.0f, 0.35f, 0.2f, 0.35f, angle + PI / 2, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
+	createRock(translate_x + 80.0f, translate_y + 80.0f, translate_z + 0.02 * 150.0f, 0.15f, 0.3f, 0.25f, angle + PI / 3, rotate_x + 0.0f, rotate_y + 0.0f, rotate_z + 1.0f);
 }
 
-void CreateResidence(float translate_x, float translate_y, float translate_z) {
-	createBrick(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f); // baza sub block
+void CreateResidence(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	createParallelipiped(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f, angle, rotate_x, rotate_y, rotate_z); // baza sub block
 
-	CreateGard(translate_x + 120.0f, translate_y, translate_z - 5.0f);
+	CreateGard(translate_x + 120.0f, translate_y, translate_z - 5.0f, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z); // gard
 
-	CreateBlock(translate_x, translate_y, translate_z);
+	CreateBlock(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
-	CreateTree(translate_x, translate_y - 75.0f, translate_z);
-	CreateTree(translate_x, translate_y + 75.0f, translate_z);
+	// CreateTree(translate_x, translate_y - 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
+	// CreateTree(translate_x, translate_y + 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
-	CreateBumpyTerrain(translate_x, translate_y, translate_z);
+	// CreateBumpyTerrain(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void RenderFunction(void)
@@ -798,7 +744,8 @@ void RenderFunction(void)
 
 	// blocuri
 
-	CreateResidence(0.0f, 0.0f, 0.0f);
+	CreateResidence(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 90.0f, 0.0f, 0.0f, 1.0f);
 
 	// copaci
 
