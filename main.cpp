@@ -1,4 +1,4 @@
-﻿//
+//
 // ================================================
 // | Grafica pe calculator                        |
 // ================================================
@@ -147,10 +147,10 @@ void CreateVBO(void)
 		1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   -1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   // varfurile cubului
-	   -50.0f,  -50.0f, 0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
-	   50.0f,  -50.0f,  0.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
-	   50.0f,  50.0f,  0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
-	   -50.0f,  50.0f,  0.0f, 1.0f,    1.0f, 0.5f, 0.2f,  0.0f, 0.0f, -1.0f,
+	   -50.0f,  -50.0f, 0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   50.0f,  -50.0f,  0.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   50.0f,  50.0f,  0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   -50.0f,  50.0f,  0.0f, 1.0f,    1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
 
 	   -50.0f,  -50.0f, 150.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   50.0f,  -50.0f,  150.0f, 1.0f, 1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
@@ -506,6 +506,11 @@ void createCone(float translate_x, float translate_y, float translate_z, float s
 }
 
 void createParallelipiped(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+
+	glBindVertexArray(VaoId_ground);
+	codCol = 0;
+	glUniform1i(codColLocation, codCol);
+
 	glm::mat4 transform = glm::mat4(1.0f);
 	transform = glm::rotate(transform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 	myMatrix = glm::translate(transform, glm::vec3(translate_x, translate_y, translate_z));
@@ -697,10 +702,10 @@ void CreateResidence(float translate_x, float translate_y, float translate_z, fl
 
 	CreateBlock(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
-	// CreateTree(translate_x, translate_y - 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
-	// CreateTree(translate_x, translate_y + 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
+	CreateTree(translate_x, translate_y - 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
+	CreateTree(translate_x, translate_y + 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
-	// CreateBumpyTerrain(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
+	CreateBumpyTerrain(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void RenderFunction(void)
@@ -745,7 +750,12 @@ void RenderFunction(void)
 	// blocuri
 
 	CreateResidence(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	CreateResidence(0.0f, 250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 90.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
+	CreateResidence(-500.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(-500.0f, -250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(-500.0f, -500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
 
 	// copaci
 
