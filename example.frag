@@ -53,4 +53,9 @@ void main(void)
         vec3 white = vec3(1.0, 1.0, 1.0);
         out_Color = vec4 (white, 1.0);
      }
+     if(codCol==4)
+	 {
+		vec3 red = vec3(0.7, 0.2, 0.2);
+		out_Color = vec4 (red, 1.0);
+	 }
   }
