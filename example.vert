@@ -42,6 +42,12 @@ void main(void)
         FragPos = vec3(gl_Position);
     }
 	if (codCol==1)
+    {
 		gl_Position = projection*view*matrUmbra*myMatrix*in_Position;
         FragPos = vec3(gl_Position);
+    }
+    if (codCol==2 || codCol==3) {
+        gl_Position = projection*view*myMatrix*in_Position;
+        FragPos = vec3(gl_Position);
+    }
    } 
