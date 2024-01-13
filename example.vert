@@ -50,4 +50,8 @@ void main(void)
         gl_Position = projection*view*myMatrix*in_Position;
         FragPos = vec3(gl_Position);
     }
+    if (codCol ==4) {
+		gl_Position = projection*view*myMatrix*in_Position;
+		FragPos = vec3(gl_Position);
+	}
    } 
