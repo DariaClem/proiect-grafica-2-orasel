@@ -43,4 +43,14 @@ void main(void)
         vec3 black = vec3 (0.0, 0.0, 0.0);
 		out_Color = vec4 (black, 1.0);
      }
+     if(codCol==2)
+     {
+        vec3 gray = vec3(0.2, 0.2, 0.2);
+        out_Color = vec4 (gray, 1.0);
+     }
+     if(codCol==3)
+     {
+        vec3 white = vec3(1.0, 1.0, 1.0);
+        out_Color = vec4 (white, 1.0);
+     }
   }
