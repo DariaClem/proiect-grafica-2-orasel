@@ -1,4 +1,4 @@
-﻿//
+//
 // ================================================
 // | Grafica pe calculator                        |
 // ================================================
@@ -91,6 +91,7 @@ int index, index_aux;
 float radius_sphere = 25.0f;
 float radius_cylinder = 10.0f;
 
+float cameraX = 0.0f, cameraY = 0.0f, cameraZ = 0.0f;
 
 // matricea umbrei
 float matrUmbra[4][4];
@@ -111,6 +112,21 @@ void processNormalKeys(unsigned char key, int x, int y)
 	case '-':
 		dist -= 5;
 		break;
+	case 'w':
+		Refx -= 20;
+		break;
+	case 's':
+		Refx += 20;
+		break;
+	case 'a':
+		Refy -= 20;
+		break;
+	case 'd':
+		Refy += 20;
+		break;
+
+	
+
 	}
 	if (key == 27)
 		exit(0);
@@ -134,6 +150,8 @@ void processSpecialKeys(int key, int xx, int yy)
 		break;
 	}
 }
+
+
 
 void CreateVBO(void)
 {
@@ -649,8 +667,8 @@ void CreateBlock(float translate_x, float translate_y, float translate_z, float 
 }
 
 void CreateTree(float x, float y, float z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createSphere(x, y, z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
-	createCylinder(x, y, z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createSphere(x, y, z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
+	createCylinder(x, y, z, scale_x, scale_y , scale_z, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void CreateGard(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -702,6 +720,9 @@ void CreateResidence(float translate_x, float translate_y, float translate_z, fl
 
 	CreateBlock(translate_x, translate_y, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
+	translate_x < 0 ? translate_x *= -1 : translate_x;
+	translate_y < 0 ? translate_y *= -1 : translate_y;
+
 	CreateTree(translate_x, translate_y - 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 	CreateTree(translate_x, translate_y + 75.0f, translate_z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 
@@ -728,8 +749,28 @@ void createRoadBand(float translate_x, float translate_y, float translate_z, flo
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
 
+void createCurb(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z)
+{
+	glBindVertexArray(VaoId_ground);
+	codCol = 4;
+	glUniform1i(codColLocation, codCol);
 
-void createRoad(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z)
+	glm::mat4 transform = glm::mat4(1.0f);
+	transform = glm::rotate(transform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	myMatrix = glm::translate(transform, glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+
+	// glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
+
+	myMatrix = myMatrix * scaleMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+}
+
+
+void createRoad(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z, bool copac)
 {
 	//Drumul:
 	glBindVertexArray(VaoId_ground);
@@ -764,12 +805,33 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 	//createRoadBand(translate_x, translate_y + 150.0f, translate_z + 20.01, scale_x / 50.0f, scale_y / 50.0f, scale_z / 50.0f, angle, rotate_x, rotate_y, rotate_z);
 	//createRoadBand(translate_x, translate_y + 200.0f, translate_z + 20.01, scale_x / 50.0f, scale_y / 50.0f, scale_z / 50.0f, angle, rotate_x, rotate_y, rotate_z);
 
+	// Bordurile
+
+	createCurb(translate_x + 40.0f, translate_y + 0.5f, translate_z, scale_x / 20.0f, scale_y, scale_z + 0.05f, angle, rotate_x, rotate_y, rotate_z);
+	createCurb(translate_x - 40.0f, translate_y + 0.5f, translate_z, scale_x / 20.0f, scale_y, scale_z + 0.05f, angle, rotate_x, rotate_y, rotate_z);
+
+	// Copacei
+
+	if (copac == true) {
+		for (int i = 0; i <= 5; i++) {
+			CreateTree(translate_x + 50.0f, translate_y + i * bandsOffset, translate_z, 1 / 2.0f, 1 / 2.0f, 1 / 2.0f, angle, rotate_x, rotate_y, rotate_z);
+
+		}
+		for (int i = 1; i <= 5; i++) {
+			CreateTree(translate_x + 50.0f, translate_y - i * bandsOffset, translate_z, 1 / 2.0f, 1 / 2.0f, 1 / 2.0f, angle, rotate_x, rotate_y, rotate_z);
+
+		}
+	}
+
 }
+
 
 void RenderFunction(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+
+	glTranslatef(-cameraX, -cameraY, -cameraZ);
 
 	//pozitia observatorului
 	Obsx = Refx + dist * cos(alpha) * cos(beta);
@@ -822,9 +884,9 @@ void RenderFunction(void)
 
 	// drum
 
-	createRoad(200.0f, 250.0f, 0.3f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f);
+	createRoad(200.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 1);
 
-	createRoad(300.0f, 250.0f, 0.3f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f);
+	createRoad(300.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 0);
 
 	glutSwapBuffers();
 	glFlush();
