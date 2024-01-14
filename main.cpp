@@ -84,7 +84,7 @@ float width = 800, height = 600, xwmin = -800.f, xwmax = 800, ywmin = -600, ywma
 glm::mat4 projection;
 
 // sursa de lumina
-float xL = 10.f, yL = 300.f, zL = 200.f;
+float xL = 10.f, yL = 300.f, zL = 600.f;
 
 int index, index_aux;
 
@@ -125,7 +125,7 @@ void processNormalKeys(unsigned char key, int x, int y)
 		Refy += 20;
 		break;
 
-	
+
 
 	}
 	if (key == 27)
@@ -496,6 +496,21 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 				GL_UNSIGNED_SHORT,
 				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
 	}
+
+	// shadow
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_sphere);
+	codCol = 1;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
 }
 
 void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -518,6 +533,23 @@ void createCylinder(float translate_x, float translate_y, float translate_z, flo
 				GL_UNSIGNED_SHORT,
 				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
 	}
+
+	//shadow
+	myMatrix = myMatrix * scaleMat * rotateMat;
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_cylinder);
+	codCol = 1;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
+
 }
 
 void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -539,6 +571,12 @@ void createParallelipiped(float translate_x, float translate_y, float translate_
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+
+	// shadow
+	codCol = 1;
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
@@ -583,6 +621,11 @@ void createBuilding(float translate_x, float translate_y, float translate_z, flo
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+	// shadow
+	codCol = 1;
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
@@ -668,7 +711,7 @@ void CreateBlock(float translate_x, float translate_y, float translate_z, float 
 
 void CreateTree(float x, float y, float z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	createSphere(x, y, z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
-	createCylinder(x, y, z, scale_x, scale_y , scale_z, angle, rotate_x, rotate_y, rotate_z);
+	createCylinder(x, y, z, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void CreateGard(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -691,6 +734,11 @@ void createRock(float translate_x, float translate_y, float translate_z, float s
 	myMatrix = myMatrix * scaleMat * rotateMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_BYTE, (void*)(0));
+
+	// shadow
+	codCol = 1;
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_BYTE, (void*)(0));
 }
@@ -747,6 +795,12 @@ void createRoadBand(float translate_x, float translate_y, float translate_z, flo
 
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+
+	// shadow
+	codCol = 1;
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
 
 void createCurb(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z)
@@ -765,6 +819,10 @@ void createCurb(float translate_x, float translate_y, float translate_z, float s
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
+	glUniform1i(codColLocation, codCol);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+	codCol = 1;
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 }
@@ -860,6 +918,8 @@ void RenderFunction(void)
 	glUniform3f(lightPosLocation, xL, yL, zL);
 	glUniform3f(viewPosLocation, Obsx, Obsy, Obsz);
 
+	
+
 	glBindVertexArray(VaoId_ground);
 	codCol = 0;
 	glUniform1i(codColLocation, codCol);
@@ -869,6 +929,8 @@ void RenderFunction(void)
 
 	// blocuri
 
+	
+
 	CreateResidence(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	CreateResidence(0.0f, 250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	CreateResidence(0.0f, 500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -876,6 +938,7 @@ void RenderFunction(void)
 	CreateResidence(-500.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
 	CreateResidence(-500.0f, -250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
 	CreateResidence(-500.0f, -500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+
 
 	// copaci
 
@@ -887,6 +950,8 @@ void RenderFunction(void)
 	createRoad(200.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 1);
 
 	createRoad(300.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 0);
+
+	
 
 	glutSwapBuffers();
 	glFlush();
