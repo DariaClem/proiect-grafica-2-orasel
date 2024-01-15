@@ -29,6 +29,10 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <random>
+#include <iostream>
+
+
 
 
 //  Identificatorii obiectelor de tip OpenGL; 
@@ -90,6 +94,8 @@ int index, index_aux;
 
 float radius_sphere = 25.0f;
 float radius_cylinder = 10.0f;
+
+float a = 25.0f, b = 45.0f;
 
 float cameraX = 0.0f, cameraY = 0.0f, cameraZ = 0.0f;
 
@@ -283,7 +289,7 @@ void CreateVBO_rock(void)
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(GLfloat), (GLvoid*)(7 * sizeof(GLfloat)));
 }
 
-void CreateVBO_sphere(void)
+void CreateVBO_sphere(void) /// acum e spheroid
 {
 	// SFERA
 	// Matricele pentru varfuri, culori, indici
@@ -297,9 +303,13 @@ void CreateVBO_sphere(void)
 			// implementarea reprezentarii parametrice 
 			float u = U_MIN_sphere + parr * step_u_sphere; // valori pentru u si v
 			float v = V_MIN_sphere + merid * step_v_sphere;
-			float x_vf = radius_sphere * cosf(u) * cosf(v); // coordonatele varfului corespunzator lui (u,v)
-			float y_vf = radius_sphere * cosf(u) * sinf(v);
-			float z_vf = 70 + radius_sphere * sinf(u);
+			//float x_vf = radius_sphere * cosf(u) * cosf(v); // coordonatele varfului corespunzator lui (u,v)
+			//float y_vf = radius_sphere * cosf(u) * sinf(v);
+			//float z_vf = 70 + radius_sphere * sinf(u);
+
+			float x_vf = a * sinf(v) * cosf(u); // coordonatele varfului corespunzator lui (u,v)
+			float y_vf = a * sinf(v) * sinf(u);
+			float z_vf = b * cosf(v) + 80;
 
 			// identificator ptr varf; coordonate + culoare + indice la parcurgerea meridianelor
 			index = merid * (NR_PARR + 1) + parr;
@@ -485,7 +495,7 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_sphere);
-	codCol = 0;
+	codCol = 5;
 	glUniform1i(codColLocation, codCol);
 	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
 	{
@@ -514,7 +524,6 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 }
 
 void createCylinder(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	// CUBUL
 	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
 	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
@@ -522,7 +531,7 @@ void createCylinder(float translate_x, float translate_y, float translate_z, flo
 	myMatrix = myMatrix * scaleMat * rotateMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_cylinder);
-	codCol = 0;
+	codCol = 6;
 	glUniform1i(codColLocation, codCol);
 	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
 	{
@@ -848,12 +857,14 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 
+	
 	float bandsOffset = 50.0f;
-	for (int i = 0; i < 7; i++) {
+	float bands = scale_y;
+	for (int i = 0; i < bands; i++) {
 		createRoadBand(translate_x, translate_y - (i * bandsOffset), translate_z + 0.5, scale_x / 50.0f, scale_y / 50.0f, scale_z / 50.0f, angle, rotate_x, rotate_y, rotate_z);
 	}
 
-	for (int i = 1; i < 7; i++) {
+	for (int i = 1; i < bands; i++) {
 		createRoadBand(translate_x, translate_y + (i * bandsOffset), translate_z + 0.5, scale_x / 50.0f, scale_y / 50.0f, scale_z / 50.0f, angle, rotate_x, rotate_y, rotate_z);
 	}
 	// Liniile:
@@ -883,6 +894,34 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 
 }
 
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<float> dis(-1400.0, 1400.0);
+std::vector<std::pair<std::pair<float,float>, float>> randomNumbers(200);
+std::uniform_real_distribution<float> dis2(0.5, 1.2);
+
+
+void randomNumbersForForest() {	
+	for (int i = 0; i < randomNumbers.size(); i++) {
+		 
+		float xtranslate = dis(gen);
+		float ytranslate = dis(gen);
+		float scale = dis2(gen);
+		if (xtranslate >= -100.0f && xtranslate <= 550.0f && ytranslate >= -200.0f && ytranslate <= 950) {
+			i--;
+			continue;
+		}
+		randomNumbers[i].first.first = xtranslate;
+		randomNumbers[i].first.second = ytranslate;
+		randomNumbers[i].second = scale;
+	}
+}
+
+void createForest() {
+	for (int i = 0; i < randomNumbers.size(); i++) {
+		CreateTree(randomNumbers[i].first.first, randomNumbers[i].first.second, 0.0f, randomNumbers[i].second, randomNumbers[i].second, randomNumbers[i].second, 0.0f, 0.0f, 0.0000001f, 0.0f);
+	}
+}
 
 void RenderFunction(void)
 {
@@ -932,25 +971,35 @@ void RenderFunction(void)
 	
 
 	CreateResidence(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	CreateResidence(0.0f, 250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	CreateResidence(0.0f, 500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 210.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 600.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(0.0f, 810.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
 
 	CreateResidence(-500.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
-	CreateResidence(-500.0f, -250.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
-	CreateResidence(-500.0f, -500.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(-500.0f, -210.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(-500.0f, -600.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	CreateResidence(-500.0f, -810.0f, 0.0f, 1.0f, 1.0f, 1.0f, 180.0f, 0.0f, 0.0f, 1.0f);
 
 
-	// copaci
-
-	//CreateTree(-100.0f, -100.0f, 0.0f);
-	//CreateTree(150.0f, 200.0f, 0.0f);
 
 	// drum
 
-	createRoad(200.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 1);
+	createRoad(200.0f, 400.0f, 0.7f, 0.8f, 11.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 1);
 
-	createRoad(300.0f, 250.0f, 0.7f, 0.8f, 7.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 0);
+	createRoad(300.0f, 400.0f, 0.7f, 0.8f, 11.0f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 0);
 
+	/*createRoad(167.0f, 105.0f, 0.7f, 0.9f, 4.2f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 1);
+
+	createRoad(335.0f, 105.0f, 0.7f, 0.9f, 4.2f, 0.001f, 0.0f, 0.0f, 0.0f, 1.0f, 0);*/
+
+	static bool isFirstRun = true;
+	if (isFirstRun) {
+		randomNumbersForForest();
+		isFirstRun = false;
+	}
+	
+	createForest();
 	
 
 	glutSwapBuffers();
