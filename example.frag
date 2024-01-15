@@ -28,10 +28,12 @@ void main(void)
     vec3 diffuse = diff * lightColor;
     
     // Specular
-    float specularStrength = 0.5f;
+    float specularStrength = 1.0f;
+    float shininess = 10.0f;
+
     vec3 viewDir = normalize(inViewPos - FragPos);//vector catre observator normalizat (V)
     vec3 reflectDir = reflect(-lightDir, normala); // reflexia razei de lumina (R)
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
     vec3 specular = specularStrength * spec * lightColor;  
     vec3 emission=vec3(0.0, 0.0, 0.0);
     vec3 result = emission+(ambient + diffuse + specular) * ex_Color;
@@ -58,4 +60,14 @@ void main(void)
 		vec3 red = vec3(0.7, 0.2, 0.2);
 		out_Color = vec4 (red, 1.0);
 	 }
+     if(codCol==5) // coroana copac
+     {
+        vec3 green = vec3(0.5625, 0.7734375, 0.1015625);
+        out_Color = vec4 (green, 1.0);
+     }
+     if(codCol==6)
+     {
+        vec3 brown = vec3(0.53515625, 0.2734375, 0.09765625);
+        out_Color = vec4 (brown, 1.0);
+     }
   }

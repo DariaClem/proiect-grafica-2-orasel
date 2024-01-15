@@ -897,7 +897,8 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<float> dis(-1400.0, 1400.0);
-std::vector<std::pair<std::pair<float,float>, float>> randomNumbers(200);
+int numberOfTrees = 200;
+std::vector<std::pair<std::pair<float,float>, float>> randomNumbers(numberOfTrees);
 std::uniform_real_distribution<float> dis2(0.5, 1.2);
 
 
