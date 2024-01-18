@@ -166,10 +166,10 @@ void CreateVBO(void)
 	{
 		// coordonate                   // culori			// normale
 		// varfuri "ground"
-	   -1500.0f,  -1500.0f, 0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
-		1500.0f,  -1500.0f, 0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
-		1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
-	   -1500.0f,  1500.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   -2000.0f,  -2000.0f, 0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
+		2000.0f,  -2000.0f, 0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
+		2000.0f,  2000.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
+	   -2000.0f,  2000.0f,  0.0f, 1.0f,  0.68f, 0.47f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   // varfurile cubului
 	   -50.0f,  -50.0f, 0.0f, 1.0f,   1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
 	   50.0f,  -50.0f,  0.0f, 1.0f,  1.0f, 0.5f, 0.2f,  0.0f, 0.0f, 1.0f,
@@ -857,7 +857,7 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 
-	
+
 	float bandsOffset = 50.0f;
 	float bands = scale_y;
 	for (int i = 0; i < bands; i++) {
@@ -882,11 +882,11 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 	// Copacei
 
 	if (copac == true) {
-		for (int i = 0; i <= 5; i++) {
+		for (int i = 0; i <= 10; i++) {
 			CreateTree(translate_x + 50.0f, translate_y + i * bandsOffset, translate_z, 1 / 2.0f, 1 / 2.0f, 1 / 2.0f, angle, rotate_x, rotate_y, rotate_z);
 
 		}
-		for (int i = 1; i <= 5; i++) {
+		for (int i = 1; i <= 10; i++) {
 			CreateTree(translate_x + 50.0f, translate_y - i * bandsOffset, translate_z, 1 / 2.0f, 1 / 2.0f, 1 / 2.0f, angle, rotate_x, rotate_y, rotate_z);
 
 		}
@@ -898,13 +898,13 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<float> dis(-1400.0, 1400.0);
 int numberOfTrees = 200;
-std::vector<std::pair<std::pair<float,float>, float>> randomNumbers(numberOfTrees);
+std::vector<std::pair<std::pair<float, float>, float>> randomNumbers(numberOfTrees);
 std::uniform_real_distribution<float> dis2(0.5, 1.2);
 
 
-void randomNumbersForForest() {	
+void randomNumbersForForest() {
 	for (int i = 0; i < randomNumbers.size(); i++) {
-		 
+
 		float xtranslate = dis(gen);
 		float ytranslate = dis(gen);
 		float scale = dis2(gen);
@@ -958,7 +958,7 @@ void RenderFunction(void)
 	glUniform3f(lightPosLocation, xL, yL, zL);
 	glUniform3f(viewPosLocation, Obsx, Obsy, Obsz);
 
-	
+
 
 	glBindVertexArray(VaoId_ground);
 	codCol = 0;
@@ -969,7 +969,7 @@ void RenderFunction(void)
 
 	// blocuri
 
-	
+
 
 	CreateResidence(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	CreateResidence(0.0f, 210.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -999,9 +999,9 @@ void RenderFunction(void)
 		randomNumbersForForest();
 		isFirstRun = false;
 	}
-	
+
 	createForest();
-	
+
 
 	glutSwapBuffers();
 	glFlush();
