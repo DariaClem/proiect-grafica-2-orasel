@@ -32,7 +32,7 @@ uniform int codCol;
 void main(void)
   {
     ex_Color=in_Color;
-   	if (codCol==0)
+   	if (codCol==0 ||  codCol == 5 || codCol == 6 || codCol == 2 || codCol == 3 || codCol == 4)
     {
 		gl_Position = projection*view*myMatrix*in_Position;
         Normal =mat3(projection*view*myMatrix)*in_Normal; 
@@ -46,16 +46,5 @@ void main(void)
 		gl_Position = projection*view*matrUmbra*myMatrix*in_Position;
         FragPos = vec3(gl_Position);
     }
-    if (codCol==2 || codCol==3) {
-        gl_Position = projection*view*myMatrix*in_Position;
-        FragPos = vec3(gl_Position);
-    }
-    if (codCol ==4) {
-		gl_Position = projection*view*myMatrix*in_Position;
-		FragPos = vec3(gl_Position);
-	}
-    if (codCol == 5 || codCol == 6) {
-		gl_Position = projection*view*myMatrix*in_Position;
-		FragPos = vec3(gl_Position);
-	}
+    
    } 
