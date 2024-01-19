@@ -61,6 +61,7 @@ lightColorLocation,
 lightPosLocation,
 viewPosLocation,
 codColLocation;
+//fogLoc
 
 int codCol;
 float PI = 3.141592;
@@ -88,7 +89,7 @@ float width = 800, height = 600, xwmin = -800.f, xwmax = 800, ywmin = -600, ywma
 glm::mat4 projection;
 
 // sursa de lumina
-float xL = 10.f, yL = 300.f, zL = 600.f;
+float xL = 0.f, yL = -100.f, zL = 700.f;
 
 int index, index_aux;
 
@@ -98,6 +99,8 @@ float radius_cylinder = 10.0f;
 float a = 25.0f, b = 45.0f;
 
 float cameraX = 0.0f, cameraY = 0.0f, cameraZ = 0.0f;
+//float fog = 0.f;
+static bool fog = false;
 
 // matricea umbrei
 float matrUmbra[4][4];
@@ -291,6 +294,9 @@ void CreateVBO_rock(void)
 
 void CreateVBO_sphere(void) /// acum e spheroid
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// SFERA
 	// Matricele pentru varfuri, culori, indici
 	glm::vec4 Vertices1[(NR_PARR + 1) * NR_MERID];
@@ -456,7 +462,10 @@ void DestroyVBO(void)
 
 void CreateShaders(void)
 {
-	ProgramId = LoadShaders("example.vert", "example.frag");
+	if(fog == false)
+		ProgramId = LoadShaders("example.vert", "example.frag");
+	else
+		ProgramId = LoadShaders("example.vert", "example-fog.frag");
 	glUseProgram(ProgramId);
 }
 
@@ -484,6 +493,7 @@ void Initialize(void)
 	lightPosLocation = glGetUniformLocation(ProgramId, "lightPos");
 	viewPosLocation = glGetUniformLocation(ProgramId, "viewPos");
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
+	//fogLoc = glGetUniformLocation(ProgramId, "isfog");
 }
 
 void createSphere(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -496,6 +506,43 @@ void createSphere(float translate_x, float translate_y, float translate_z, float
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glBindVertexArray(VaoId_sphere);
 	codCol = 5;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
+
+	// shadow
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_sphere);
+	codCol = 1;
+	glUniform1i(codColLocation, codCol);
+	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
+	{
+		if ((patr + 1) % (NR_PARR + 1) != 0) // nu sunt considerate fetele in care in stanga jos este Polul Nord
+			glDrawElements(
+				GL_QUADS,
+				4,
+				GL_UNSIGNED_SHORT,
+				(GLvoid*)((2 * (NR_PARR + 1) * (NR_MERID)+4 * patr) * sizeof(GLushort)));
+	}
+}
+
+void createSphereForSmoke(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+	myMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, translate_y, translate_z));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(scale_x, scale_y, scale_z));
+	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(rotate_x, rotate_y, rotate_z));
+
+	myMatrix = myMatrix * scaleMat * rotateMat;
+
+	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
+	glBindVertexArray(VaoId_sphere);
+	codCol = 7;
 	glUniform1i(codColLocation, codCol);
 	for (int patr = 0; patr < (NR_PARR + 1) * NR_MERID; patr++)
 	{
@@ -564,10 +611,10 @@ void createCylinder(float translate_x, float translate_y, float translate_z, flo
 void createCone(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 }
 
-void createParallelipiped(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
+void createParallelipiped(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z, GLfloat codColVariable) {
 
 	glBindVertexArray(VaoId_ground);
-	codCol = 0;
+	codCol = codColVariable;
 	glUniform1i(codColLocation, codCol);
 
 	glm::mat4 transform = glm::mat4(1.0f);
@@ -580,9 +627,7 @@ void createParallelipiped(float translate_x, float translate_y, float translate_
 	myMatrix = myMatrix * scaleMat;
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 
-	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
-
 
 	// shadow
 	codCol = 1;
@@ -592,28 +637,28 @@ void createParallelipiped(float translate_x, float translate_y, float translate_
 
 void createWindow(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
 	// window frame
-	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 100.0f, 0.05f, 0.03f, 0.2f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.2f, angle, rotate_x, rotate_y, rotate_z, 9);
 
-	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 2 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 3 * 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.27f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 0.27f / 2 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 49.9f, translate_y - 20.0f, translate_z + 100.0f + 3 * 0.27f / 4 * 100.0f, 0.05f, 0.17f, 0.01f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.27f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// window glass
-	createParallelipiped(translate_x + 49.8f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.22f, 0.2f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.8f, translate_y - 20.0f, translate_z + 100.0f, 0.05f, 0.22f, 0.2f, angle, rotate_x, rotate_y, rotate_z, 10);
 }
 
 void createDoor(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.265f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y - 30.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z, 11);
+	createParallelipiped(translate_x + 50.0f, translate_y - 10.0f, translate_z + 80.0f, 0.05f, 0.03f, 0.33f, angle, rotate_x, rotate_y, rotate_z, 11);
+	createParallelipiped(translate_x + 50.0f, translate_y - 20.0f, translate_z + 100.0f + 0.265f * 100.0f, 0.05f, 0.17f, 0.02f, angle, rotate_x, rotate_y, rotate_z, 12);
 
-	createParallelipiped(translate_x + 49.5f, translate_y - 20.0f, translate_z + 80.0f, 0.05f, 0.2f, 0.33f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.5f, translate_y - 20.0f, translate_z + 80.0f, 0.05f, 0.2f, 0.33f, angle, rotate_x, rotate_y, rotate_z, 11);
 
-	createParallelipiped(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 49.6f, translate_y - 15.0f, translate_z + 100.0f, 0.05f, 0.015f, 0.05f, angle, rotate_x, rotate_y, rotate_z, 12);
 }
 
 void createBuilding(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -643,28 +688,32 @@ void createChimney(float translate_x, float translate_y, float translate_z, floa
 	// con
 	// cilindru
 	createCylinder(translate_x, translate_y, translate_z, 0.5f, 0.5f, 0.1f, angle, rotate_x, rotate_y, rotate_z);
+	createSphereForSmoke(translate_x, translate_y, translate_z - 30.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createSphereForSmoke(translate_x + 5.0f, translate_y + 10.0f, translate_z - 20.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createSphereForSmoke(translate_x - 10.0f, translate_y - 10.0f, translate_z - 13.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createSphereForSmoke(translate_x - 10.0f, translate_y + 10.0f, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void createRoof(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createParallelipiped(translate_x - 25.0f, translate_y - 25.0f, translate_z + 150.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 25.0f, translate_y - 5.0f, translate_z + 151.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 25.0f, translate_y - 25.0f, translate_z + 150.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 25.0f, translate_y - 5.0f, translate_z + 151.2f, 0.11f, 0.11f, 0.01f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// createParallelipiped(translate_x + 20.0f, translate_y - 25.0f, translate_z + 150.2f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void CreateBlock(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createParallelipiped(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z, 0);
 
 	// beams
-	createParallelipiped(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.0f, translate_y, translate_z + 150.0f, 0.05f, 1.0f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x, translate_y + 50.0f - 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x, translate_y - 50.0f + 0.05 * 50.0f, translate_z + 150.0f, 1.0f - 0.025f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
-	createParallelipiped(translate_x + 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x, translate_y + 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x, translate_y - 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.0f, translate_y, translate_z, 0.05f, 1.0f + 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x, translate_y + 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x, translate_y - 50.0f, translate_z, 1.0f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 
 	// windows
@@ -685,37 +734,42 @@ void CreateBlock(float translate_x, float translate_y, float translate_z, float 
 
 	// bricks
 	// front
-	createParallelipiped(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// back
-	createParallelipiped(translate_x - 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x - 50.2f, translate_y + 40.0f, translate_z + 60.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.2f, translate_y + 30.0f, translate_z + 67.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.2f, translate_y, translate_z + 50.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.2f, translate_y - 46.0f, translate_z + 80.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 50.2f, translate_y + 46.0f, translate_z + 130.0f, 0.05f, 0.1f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// right
-	createParallelipiped(translate_x, translate_y + 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 22.0f, translate_y + 50.2f, translate_z + 90.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 12.0f, translate_y + 50.2f, translate_z + 120.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 40.0f, translate_y + 50.2f, translate_z + 10.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y + 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 22.0f, translate_y + 50.2f, translate_z + 90.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 12.0f, translate_y + 50.2f, translate_z + 120.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 40.0f, translate_y + 50.2f, translate_z + 10.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// left
-	createParallelipiped(translate_x, translate_y - 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 22.0f, translate_y - 50.2f, translate_z + 130.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 2.0f, translate_y - 50.2f, translate_z + 20.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x - 45.0f, translate_y - 50.2f, translate_z + 70.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
-	createParallelipiped(translate_x + 35.0f, translate_y - 50.2f, translate_z + 110.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y - 50.2f, translate_z + 82.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 22.0f, translate_y - 50.2f, translate_z + 130.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 2.0f, translate_y - 50.2f, translate_z + 20.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x - 45.0f, translate_y - 50.2f, translate_z + 70.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
+	createParallelipiped(translate_x + 35.0f, translate_y - 50.2f, translate_z + 110.0f, 0.1f, 0.05f, 0.03f, angle, rotate_x, rotate_y, rotate_z, 9);
 
 	// panel
-	createParallelipiped(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x + 55.0f, translate_y - 50.0f, translate_z + 90.0f, 0.25f, 0.01f, 0.35f, angle, rotate_x, rotate_y, rotate_z, 11);
 
 	// roof
 	createRoof(translate_x, translate_y, translate_z, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+
+	if (translate_x < 0 or translate_y < 0)
+		createChimney(translate_x * (-1) + 25.0f, translate_y * (-1) - 20.0f, translate_z + 150.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
+	else
+		createChimney(translate_x - 25.0f, translate_y + 20.0f, translate_z + 150.0f, 1.0f, 1.0f, 1.0f, angle, rotate_x, rotate_y, rotate_z);
 }
 
 void CreateTree(float x, float y, float z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
@@ -724,10 +778,10 @@ void CreateTree(float x, float y, float z, float scale_x, float scale_y, float s
 }
 
 void CreateGard(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createParallelipiped(translate_x, translate_y, translate_z + 17.0f, 0.018f, 1.85f, 0.02f, angle, rotate_x, rotate_y, rotate_z);
+	createParallelipiped(translate_x, translate_y, translate_z + 17.0f, 0.018f, 1.85f, 0.02f, angle, rotate_x, rotate_y, rotate_z, 12);
 
 	for (int index = 85; index >= -87; index -= 12)
-		createParallelipiped(translate_x, translate_y - index, translate_z, 0.02f, 0.032f, 0.16f, angle, rotate_x, rotate_y, rotate_z);
+		createParallelipiped(translate_x, translate_y - index, translate_z, 0.02f, 0.032f, 0.16f, angle, rotate_x, rotate_y, rotate_z, 12);
 
 }
 
@@ -771,7 +825,7 @@ void CreateBumpyTerrain(float translate_x, float translate_y, float translate_z,
 }
 
 void CreateResidence(float translate_x, float translate_y, float translate_z, float scale_x, float scale_y, float scale_z, float angle, float rotate_x, float rotate_y, float rotate_z) {
-	createParallelipiped(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f, angle, rotate_x, rotate_y, rotate_z); // baza sub block
+	createParallelipiped(translate_x + 20.0f, translate_y, translate_z, 2.1f, 2.1f, 0.02f, angle, rotate_x, rotate_y, rotate_z, 13); // baza sub block
 
 	CreateGard(translate_x + 120.0f, translate_y, translate_z - 5.0f, scale_x, scale_y, scale_z, angle, rotate_x, rotate_y, rotate_z); // gard
 
@@ -856,6 +910,8 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
+
+
 
 
 	float bandsOffset = 50.0f;
@@ -958,6 +1014,7 @@ void RenderFunction(void)
 	glUniform3f(lightPosLocation, xL, yL, zL);
 	glUniform3f(viewPosLocation, Obsx, Obsy, Obsz);
 
+	//glUniform1f(fogLoc, fog);
 
 
 	glBindVertexArray(VaoId_ground);
