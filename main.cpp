@@ -31,12 +31,17 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <random>
 #include <iostream>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "stb_image.h"
+#include "SOIL.h"
 
 
 
 
 //  Identificatorii obiectelor de tip OpenGL; 
 GLuint
+VaoId_skybox,
+VboId_skybox,
 VaoId_ground,
 VboId_ground,
 EboId_ground,
@@ -51,11 +56,14 @@ VboId_rock,
 EboId_rock,
 ColorBufferId,
 ProgramId,
+ProgramId2,
 ProgramIdcon,
 myMatrixLocation,
 matrUmbraLocation,
 viewLocation,
+viewLocationSkybox,
 projLocation,
+projLocationSkybox,
 matrRotlLocation,
 lightColorLocation,
 lightPosLocation,
@@ -104,6 +112,122 @@ static bool fog = false;
 
 // matricea umbrei
 float matrUmbra[4][4];
+
+unsigned int cubemapTexture;
+
+
+std::vector<std::string> faces
+{
+	"right.bmp",
+		"left.bmp",
+		"top.bmp",
+		"bottom.bmp",
+		"front.bmp",
+		"back.bmp"
+};
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		//unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			SOIL_free_image_data(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			SOIL_free_image_data(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+
+void CreateVBO_skybox(void)
+{
+	// varfurile 
+	float Vertices[1000] = {
+		// skybox           
+		-1.0f,  1.0f , -1.0f,
+		-1.0f, -1.0f , -1.0f,
+		 1.0f, -1.0f , -1.0f,
+		 1.0f, -1.0f , -1.0f,
+		 1.0f,  1.0f , -1.0f,
+		-1.0f,  1.0f , -1.0f,
+
+		-1.0f, -1.0f ,  1.0f,
+		-1.0f, -1.0f , -1.0f,
+		-1.0f,  1.0f , -1.0f,
+		-1.0f,  1.0f , -1.0f,
+		-1.0f,  1.0f ,  1.0f,
+		-1.0f, -1.0f ,  1.0f,
+
+		 1.0f, -1.0f , -1.0f,
+		 1.0f, -1.0f ,  1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		 1.0f,  1.0f , -1.0f,
+		 1.0f, -1.0f , -1.0f,
+
+		-1.0f, -1.0f ,  1.0f,
+		-1.0f,  1.0f ,  1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		 1.0f, -1.0f ,  1.0f,
+		-1.0f, -1.0f ,  1.0f,
+
+		-1.0f,  1.0f , -1.0f,
+		 1.0f,  1.0f , -1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		 1.0f,  1.0f ,  1.0f,
+		-1.0f,  1.0f ,  1.0f,
+		-1.0f,  1.0f , -1.0f,
+
+		-1.0f, -1.0f , -1.0f,
+		-1.0f, -1.0f ,  1.0f,
+		 1.0f, -1.0f , -1.0f,
+		 1.0f, -1.0f , -1.0f,
+		-1.0f, -1.0f ,  1.0f,
+		 1.0f, -1.0f ,  1.0f
+	};
+
+	glGenVertexArrays(1, &VaoId_skybox);
+	glBindVertexArray(VaoId_skybox);
+	glGenBuffers(1, &VboId_skybox);
+	glBindBuffer(GL_ARRAY_BUFFER, VboId_skybox);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+
+	// atributul 0 = texturare
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	
+	cubemapTexture = loadCubemap(faces);
+}
+
+
+
 
 void processNormalKeys(unsigned char key, int x, int y)
 {
@@ -443,6 +567,10 @@ void DestroyVBO(void)
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDeleteBuffers(1, &VboId_skybox);
+	glDeleteVertexArrays(1, &VaoId_skybox);
+
 	glDeleteBuffers(1, &VboId_ground);
 	glDeleteBuffers(1, &EboId_ground);
 	glBindVertexArray(0);
@@ -466,12 +594,14 @@ void CreateShaders(void)
 		ProgramId = LoadShaders("example.vert", "example.frag");
 	else
 		ProgramId = LoadShaders("example.vert", "example-fog.frag");
+	ProgramId2 = LoadShaders("skybox.vert", "skybox.frag");
 	glUseProgram(ProgramId);
 }
 
 void DestroyShaders(void)
 {
 	glDeleteProgram(ProgramId);
+	glDeleteProgram(ProgramId2);
 }
 
 void Initialize(void)
@@ -479,6 +609,7 @@ void Initialize(void)
 	myMatrix = glm::mat4(1.0f);
 	matrRot = glm::rotate(glm::mat4(1.0f), PI / 8, glm::vec3(0.0, 0.0, 1.0));
 	glClearColor(0.68f, 0.91f, 0.92f, 0.0f);
+	CreateVBO_skybox();
 	CreateVBO();
 	CreateVBO_sphere();
 	CreateVBO_cylinder();
@@ -493,6 +624,9 @@ void Initialize(void)
 	lightPosLocation = glGetUniformLocation(ProgramId, "lightPos");
 	viewPosLocation = glGetUniformLocation(ProgramId, "viewPos");
 	codColLocation = glGetUniformLocation(ProgramId, "codCol");
+
+	viewLocationSkybox = glGetUniformLocation(ProgramId2, "view");
+	projLocationSkybox = glGetUniformLocation(ProgramId2, "projection");
 	//fogLoc = glGetUniformLocation(ProgramId, "isfog");
 }
 
@@ -911,9 +1045,6 @@ void createRoad(float translate_x, float translate_y, float translate_z, float s
 	glUniform1i(codColLocation, codCol);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (void*)(6));
 
-
-
-
 	float bandsOffset = 50.0f;
 	float bands = scale_y;
 	for (int i = 0; i < bands; i++) {
@@ -1009,6 +1140,11 @@ void RenderFunction(void)
 	matrUmbra[3][0] = -D * xL; matrUmbra[3][1] = -D * yL; matrUmbra[3][2] = -D * zL; matrUmbra[3][3] = zL;
 	glUniformMatrix4fv(matrUmbraLocation, 1, GL_FALSE, &matrUmbra[0][0]);
 
+	
+
+
+
+
 	// Variabile uniforme pentru iluminare
 	glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
 	glUniform3f(lightPosLocation, xL, yL, zL);
@@ -1016,6 +1152,7 @@ void RenderFunction(void)
 
 	//glUniform1f(fogLoc, fog);
 
+	glUseProgram(ProgramId);
 
 	glBindVertexArray(VaoId_ground);
 	codCol = 0;
@@ -1023,6 +1160,35 @@ void RenderFunction(void)
 	myMatrix = glm::mat4(1.0f);
 	glUniformMatrix4fv(myMatrixLocation, 1, GL_FALSE, &myMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+
+
+
+
+	// Since the cubemap will always have a depth of 1.0, we need that equal sign so it doesn't get discarded
+	glDepthFunc(GL_LEQUAL);
+	glUseProgram(ProgramId2);
+
+	glm::mat4 rotationSkybox = glm::rotate(glm::mat4(1.0f), PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 translationSkybox = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.2f));
+	view = glm::mat4(glm::mat3(view));
+	view = view * translationSkybox * rotationSkybox;
+	glBindVertexArray(VaoId_skybox);
+	glUniformMatrix4fv(viewLocationSkybox, 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(projLocationSkybox, 1, GL_FALSE, &projection[0][0]);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Switch back to the normal depth function
+	glDepthFunc(GL_LESS);
+
+
+	//glDepthMask(GL_TRUE);
+
+
+	glUseProgram(ProgramId);
+
+
 
 	// blocuri
 
