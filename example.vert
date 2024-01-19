@@ -19,6 +19,7 @@ out vec3 inLightPos;
 out vec3 inViewPos;
 out vec3 ex_Color;
 out vec3 dir;
+//flat out float isfog;
  
 uniform mat4 matrUmbra;
 uniform mat4 myMatrix;
@@ -28,11 +29,13 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform vec3 lightColor;
 uniform int codCol;
+uniform float fog;
 
 void main(void)
   {
     ex_Color=in_Color;
-   	if (codCol==0 ||  codCol == 5 || codCol == 6 || codCol == 2 || codCol == 3 || codCol == 4)
+    //isfog = fog;
+   	if (codCol==0 || codCol==2 || codCol==3 || codCol==4 || codCol==5 || codCol==6 || codCol==7 || codCol==8 || codCol==9 || codCol==10 || codCol==11 || codCol==12)
     {
 		gl_Position = projection*view*myMatrix*in_Position;
         Normal =mat3(projection*view*myMatrix)*in_Normal; 
@@ -40,11 +43,12 @@ void main(void)
         inViewPos =vec3(projection*view*myMatrix*vec4(viewPos, 1.0f));
         dir = mat3(projection*view*myMatrix) * vec3(0.0,100.0,200.0); // pentru sursa directionala
         FragPos = vec3(gl_Position);
+        
     }
 	if (codCol==1)
     {
 		gl_Position = projection*view*matrUmbra*myMatrix*in_Position;
         FragPos = vec3(gl_Position);
     }
-    
-   } 
+
+   }
