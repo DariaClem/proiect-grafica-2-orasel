@@ -18,7 +18,8 @@ void main(void)
     if (codCol==1) // pentru codCol==1 este desenata umbra
     {
         vec3 black = vec3 (0.0, 0.0, 0.0);
-		out_Color = vec4 (black, 1.0);
+        vec3 final = mix(vec3(0.68, 0.47, 0.2), vec3(0.0, 0.0, 0.0), 0.6);
+		out_Color = vec4 (final, 1.0);
     }
     else{
         // Ambient
