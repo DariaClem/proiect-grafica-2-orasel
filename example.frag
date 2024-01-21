@@ -18,7 +18,8 @@ void main(void)
     if (codCol==1) // pentru codCol==1 este desenata umbra
     {
         vec3 black = vec3 (0.0, 0.0, 0.0);
-		out_Color = vec4 (black, 1.0);
+        vec3 final = mix(vec3(0.68, 0.47, 0.2), vec3(0.0, 0.0, 0.0), 0.6);
+		out_Color = vec4 (final, 1.0);
     }
     else{
         // Ambient
@@ -34,11 +35,13 @@ void main(void)
     
         // Specular
         float specularStrength = 1.0f;
-        float shininess = 10.0f;
+        float shininess = 25.0f;
 
         vec3 viewDir = normalize(inViewPos - FragPos);//vector catre observator normalizat (V)
         vec3 reflectDir = reflect(-lightDir, normala); // reflexia razei de lumina (R)
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+        //float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+        vec3 halfWayDir = normalize(lightDir + viewDir);
+        float spec = pow(max(dot(normala, halfWayDir), 0.0), shininess);
         vec3 specular = specularStrength * spec * lightColor;  
         vec3 emission=vec3(0.0, 0.0, 0.0);
         
